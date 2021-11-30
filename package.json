@@ -19,6 +19,7 @@
   "homepage": "https://github.com/hawi19952/learning-node#readme",
   "dependencies": {
     "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
     "http": "^0.0.1-security"
   }
 }
