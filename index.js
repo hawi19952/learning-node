@@ -1,6 +1,8 @@
 const http = require('http'); 
 const dotenv = require('dotenv').config(); 
 const fs = require('fs');
+const { Console } = require('console');
+const { stderr } = require('process');
 
 const port = process.env.PORT || 3000; 
 
@@ -24,25 +26,63 @@ server.listen(port, logServerStatus(port));
     console.error(err);
 }
 */
-const presentName = (jsonObject) => {
-    let outputValue = jsonObject.name; 
-    return outputValue; 
+
+const readFile = (filePath) => {
+    const rawData = fs.readFileSync(`./${filePath}`);
+    const fileContent = JSON.parse(rawData)[0];
+    console.log(fileContent);
+
+    return fileContent;
 }
 
-const jsonParser =  (fileReader) => {
-    let dataObject = JSON.parse(fs.readFileSync(fileReader)); 
+const personalInfo = readFile('before.json');
 
-    return dataObject; 
+
+const getKeyType = (obj) => {
+
+    //External validator for the number of keys, it should be one only! 
+
+    const objectLength = Object.keys(obj).length; 
+    console.log(`object length is :${objectLength}`);
+
+    let result = {}; 
+    let objectKey = Object.keys(obj);
+    let objectType = typeof obj; 
+
+    result.key = objectKey; 
+    result.type = objectType; 
+    return result; 
 }
 
-const objectifyJson = (fileName, propertyName) => {
-    let objectOutput = jsonParser(fileName);
-    let keyValue = objectOutput.propertyName; 
+const getObjectName = (jsonObject) => {
+    let test = getKeyType(jsonObject); 
+
+    if (test.type ==! "object")
+        return "default";
+
+    let key = test.key; 
+
+    return key; 
 }
 
-try {
-    presentName(objectifyJson('before.json'));
-    
-} catch (error) {
-    console.error(error);
+
+const logObjectFile = new Console({
+    stdout: fs.createWriteStream("./jsonObjects/objectName.js"), 
+    stderr: fs.createWriteStream("./jsonObjects/error.js"),
+})
+
+const writeObjectFile = (obj) => {
+
+    const objectName = getObjectName(obj)[0];
+    const output = JSON.stringify(obj)
+    const objectOutput = Object.values(obj)[0]; 
+    try {
+        fs.writeFileSync(`./jsonObjects/${obj}.json`, output)
+        
+        logObjectFile.log("export const ", objectName ," = ",objectOutput);
+    } catch (error) {
+        console.error(error);
+    }
 }
+
+writeObjectFile(personalInfo);
