@@ -4,6 +4,8 @@ const fs = require('fs');
 const { Console } = require('console');
 const { stderr } = require('process');
 
+const Person = require('./after.json')
+
 const port = process.env.PORT || 3000; 
 
 
@@ -66,16 +68,19 @@ const getObjectName = (jsonObject) => {
 }
 
 
-const logObjectFile = new Console({
-    stdout: fs.createWriteStream("./jsonObjects/objectName.js"), 
-    stderr: fs.createWriteStream("./jsonObjects/error.js"),
-})
 
 const writeObjectFile = (obj) => {
 
     const objectName = getObjectName(obj)[0];
     const output = JSON.stringify(obj)
     const objectOutput = Object.values(obj)[0]; 
+    
+
+    const logObjectFile = new Console({
+        stdout: fs.createWriteStream(`./jsonObjects/${objectName}.js`), 
+        stderr: fs.createWriteStream("./jsonObjects/error.js"),
+    })
+    
     try {
         fs.writeFileSync(`./jsonObjects/${obj}.json`, output)
         
@@ -85,4 +90,6 @@ const writeObjectFile = (obj) => {
     }
 }
 
-writeObjectFile(personalInfo);
+const jsonObject = Person; 
+
+const firstName = jsonObject.car.modelYear
